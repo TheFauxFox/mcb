@@ -5,6 +5,12 @@ import Screen from "./screen";
 
 config();
 
+function sleep(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 const bot = mineflayer.createBot({
   host: "play.theoasismc.com",
   username: process.env.EMAIL ?? "",
@@ -26,10 +32,32 @@ bot.on("message", async (msg, position) => {
   }
 });
 
-bot.on("kicked", screen.addChatLine);
-bot.on("error", (err) => {
+bot.on("kicked", async (msg) => {
+  screen.addChatLine(msg);
+  if (process.env.RECONNECT === "true") {
+    await sleep(parseInt(process.env.RECONNECT_TIME ?? "3") * 1000);
+    bot.connect({
+      host: "play.theoasismc.com",
+      username: process.env.EMAIL ?? "",
+      password: process.env.PASSWORD ?? "",
+      auth: "microsoft",
+      defaultChatPatterns: false,
+    });
+  }
+});
+bot.on("error", async (err) => {
   screen.log(err.message);
   screen.addChatLine(err.message);
+  if (process.env.RECONNECT === "true") {
+    await sleep(parseInt(process.env.RECONNECT_TIME ?? "3") * 1000);
+    bot.connect({
+      host: "play.theoasismc.com",
+      username: process.env.EMAIL ?? "",
+      password: process.env.PASSWORD ?? "",
+      auth: "microsoft",
+      defaultChatPatterns: false,
+    });
+  }
 });
 
 screen.onMessage(async (text) => {
