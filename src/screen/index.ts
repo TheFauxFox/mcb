@@ -17,6 +17,7 @@ export default class Screen {
   chatBox!: blessed.Widgets.ScrollableBoxElement;
   playerList!: blessed.Widgets.ListElement;
   inputBar!: blessed.Widgets.TextboxElement;
+  serverInfoBox!: blessed.Widgets.ScrollableBoxElement;
   logDir: string;
 
   constructor(name: string, logDir: string = "./logs") {
@@ -32,10 +33,10 @@ export default class Screen {
       style: { fg: "white", bg: "black", border: { fg: "white" } },
     };
     this.addWidgets();
-    this._screen.key(["C-c"], () => process.exit(0));
-    this.playerList.key(["C-c"], () => process.exit(0));
-    this.inputBar.key(["C-c"], () => process.exit(0));
-    this.chatBox.key(["C-c"], () => process.exit(0));
+    this._screen.key(["C-c"], this.exit);
+    this.playerList.key(["C-c"], this.exit);
+    this.inputBar.key(["C-c"], this.exit);
+    this.chatBox.key(["C-c"], this.exit);
     this.inputBar.focus();
     this.logDir = path.resolve(logDir);
     mkdirSync(this.logDir, { recursive: true });
@@ -59,8 +60,20 @@ export default class Screen {
       top: 0,
       left: "80%",
       width: "20%",
-      height: "100%",
+      height: "70%",
       label: "Players",
+      ...this.defaultOptions,
+    });
+
+    //@ts-ignore
+    this.serverInfoBox = blessed.box({
+      left: "80%",
+      top: "70%",
+      width: "20%",
+      height: "31%",
+      label: "Server Info",
+      alwaysScroll: true,
+      mouse: true,
       ...this.defaultOptions,
     });
 
@@ -79,6 +92,7 @@ export default class Screen {
 
     this._screen.append(this.chatBox);
     this._screen.append(this.inputBar);
+    this._screen.append(this.serverInfoBox);
     this._screen.append(this.playerList);
   }
 
@@ -108,8 +122,26 @@ export default class Screen {
 
   async updatePlayerList(players: { [username: string]: mineflayer.Player }) {
     this.playerList.clearItems();
-    Object.values(players).forEach(async (player) => {
+    for (const player of Object.values(players)) {
       this.playerList.addItem(await parseExtras(player.displayName.json));
-    });
+    }
+    this.playerList.setLabel(`Players (${Object.values(players).length})`);
+  }
+
+  fixTime(time: number): string {
+    const ratio = 1000 / 60;
+    const t = Math.round((time + 6000) % 24000);
+    const hour = Math.floor(t / 1000);
+    const minute = Math.round((t % 1000) / ratio);
+    return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+  }
+
+  async updateServerInfo(info: { [key: string]: string }) {
+    this.serverInfoBox.setLine(0, `Logged in as ${info.username}`);
+    this.serverInfoBox.setLine(1, `Version: ${info.version}`);
+    this.serverInfoBox.setLine(2, `Ping: ${info.ping}ms`);
+    this.serverInfoBox.setLine(3, `Time: ${this.fixTime(parseInt(info.time))}`);
+    this.serverInfoBox.setLine(4, `Health: ${info.health}/20`);
+    this.serverInfoBox.setLine(5, `Hunger: ${info.hunger}/20`);
   }
 }

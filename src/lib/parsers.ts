@@ -5,6 +5,8 @@ const parseExtras = async (data: NBTExtra) => {
   let text = "";
   if (data.text) {
     text += data.text;
+  } else if (data.translate) {
+    text += data.translate;
   } else if (Object.values(data).length == 1) {
     text += Object.values(data)[0];
   }
@@ -22,6 +24,11 @@ const parseExtras = async (data: NBTExtra) => {
   text += "{/}";
   if (data.extra) {
     for (const extra of data.extra) {
+      text += await parseExtras(extra);
+    }
+  }
+  if (data.with) {
+    for (const extra of data.with) {
       text += await parseExtras(extra);
     }
   }

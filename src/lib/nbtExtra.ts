@@ -7,5 +7,7 @@ export type NBTExtra = {
   strikethrough?: boolean;
   text?: string;
   extra?: NBTExtra[];
+  with?: NBTExtra[];
+  translate?: string;
   ""?: string;
 };

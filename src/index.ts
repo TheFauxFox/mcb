@@ -17,7 +17,6 @@ const screen = new Screen("Minecraft Chat");
 
 bot.on("spawn", () => {
   screen.addChatLine("Logged in!");
-  screen.updatePlayerList(bot.players);
 });
 
 bot.on("message", async (msg, position) => {
@@ -25,14 +24,6 @@ bot.on("message", async (msg, position) => {
     screen.log(JSON.stringify(msg.json));
     screen.addChatLine(await parseChat(msg.json));
   }
-});
-
-bot.on("playerJoined", () => {
-  screen.updatePlayerList(bot.players);
-});
-
-bot.on("playerLeft", () => {
-  screen.updatePlayerList(bot.players);
 });
 
 bot.on("kicked", screen.addChatLine);
@@ -51,4 +42,17 @@ screen.onMessage(async (text) => {
     screen.inputBar.setValue("");
     screen.inputBar.focus();
   }
+});
+
+bot.on("time", async () => {
+  await screen.updatePlayerList(bot.players);
+  await screen.updateServerInfo({
+    username: bot.username,
+    ping: bot.player.ping.toString(),
+    version: bot.version,
+    time: bot.time.timeOfDay.toString(),
+    health: bot.health.toString(),
+    hunger: bot.food.toString(),
+  });
+  screen._screen.render();
 });
