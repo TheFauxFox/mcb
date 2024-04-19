@@ -117,7 +117,6 @@ export default class Screen {
 
   exit() {
     this._screen.destroy();
-    process.exit(0);
   }
 
   async updatePlayerList(players: { [username: string]: mineflayer.Player }) {

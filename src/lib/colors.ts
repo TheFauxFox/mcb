@@ -1,4 +1,4 @@
-export default {
+const colors: Record<string, string> = {
   dark_red: "{#AA0000-fg}",
   red: "{#FF5555-fg}",
   gold: "{#FFAA00-fg}",
@@ -16,3 +16,4 @@ export default {
   dark_gray: "{#555555-fg}",
   black: "{#000000-fg}",
 };
+export default colors;

@@ -4,6 +4,7 @@ import { parseChat } from "./lib/parsers";
 import Screen from "./screen";
 
 config();
+const screen = new Screen("Minecraft Chat");
 
 function sleep(ms: number) {
   return new Promise((resolve) => {
@@ -12,14 +13,12 @@ function sleep(ms: number) {
 }
 
 const bot = mineflayer.createBot({
-  host: "play.theoasismc.com",
+  host: process.env.SERVER ?? "localhost",
   username: process.env.EMAIL ?? "",
   password: process.env.PASSWORD ?? "",
   auth: "microsoft",
   defaultChatPatterns: false,
 });
-
-const screen = new Screen("Minecraft Chat");
 
 bot.on("spawn", () => {
   screen.addChatLine("Logged in!");
@@ -31,6 +30,13 @@ bot.on("message", async (msg, position) => {
     screen.addChatLine(await parseChat(msg.json));
   }
 });
+
+// bot.on("messagestr", async (msg, position, json) => {
+//   if (position == "system" || position == "chat") {
+//     screen.log(JSON.stringify(json));
+//     screen.addChatLine(msg);
+//   }
+// });
 
 bot.on("kicked", async (msg) => {
   screen.addChatLine(msg);
@@ -45,19 +51,11 @@ bot.on("kicked", async (msg) => {
     });
   }
 });
+
 bot.on("error", async (err) => {
-  screen.log(err.message);
-  screen.addChatLine(err.message);
-  if (process.env.RECONNECT === "true") {
-    await sleep(parseInt(process.env.RECONNECT_TIME ?? "3") * 1000);
-    bot.connect({
-      host: "play.theoasismc.com",
-      username: process.env.EMAIL ?? "",
-      password: process.env.PASSWORD ?? "",
-      auth: "microsoft",
-      defaultChatPatterns: false,
-    });
-  }
+  screen.exit();
+  bot.end(err.message);
+  console.error(err);
 });
 
 screen.onMessage(async (text) => {
