@@ -3,7 +3,7 @@ import blessed from "blessed";
 import { mkdirSync } from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
-import { parseExtras } from "../lib/parsers";
+import chatParser from "../lib/parsers";
 
 export default class Screen {
   _screen: blessed.Widgets.Screen;
@@ -122,18 +122,18 @@ export default class Screen {
   async updatePlayerList(players: { [username: string]: mineflayer.Player }) {
     this.playerList.clearItems();
     for (const player of Object.values(players)) {
-      this.playerList.addItem(await parseExtras(player.displayName.json));
+      this.playerList.addItem(await chatParser(player.displayName.json));
     }
     this.playerList.setLabel(`Players (${Object.values(players).length})`);
   }
 
-  fixTime(time: number): string {
+  fixTime = (time: number): string => {
     const ratio = 1000 / 60;
     const t = Math.round((time + 6000) % 24000);
     const hour = Math.floor(t / 1000);
     const minute = Math.round((t % 1000) / ratio);
     return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
-  }
+  };
 
   async updateServerInfo(info: { [key: string]: string }) {
     this.serverInfoBox.setLine(0, `Logged in as ${info.username}`);

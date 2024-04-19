@@ -1,24 +1,5 @@
 import colors from "./lib/colors";
-import { sprintf } from "./lib/parsers";
 import translations from "./lib/translations";
-import blessed from "blessed";
-
-// const screen = blessed.screen({
-//   smartCSR: true,
-//   title: "Test Screen",
-// });
-
-// const box = blessed.box({
-//   top: 0,
-//   left: 0,
-//   width: "100%",
-//   height: "100%",
-//   mouse: true,
-// });
-// box.key(["escape", "q", "C-c"], () => {
-//   screen.destroy();
-// });
-// screen.append(box);
 
 type NBTData = {
   italic?: boolean | number;
@@ -165,15 +146,57 @@ const msg3: NBTData = {
   translate: "chat.type.advancement.task",
 };
 
-const Parser = async (msg: NBTData): Promise<string> => {
-  const isTranslation = (key: string) => key in translations;
-  const isColor = (color: string) => color in colors;
+const msg4: NBTData = {
+  translate: "%s",
+  with: [
+    {
+      extra: [
+        { bold: 1, color: "#9C59D1", text: "⚲ " },
+        { bold: 1, color: "dark_gray", text: "[Scribe]" },
+        { "": " " },
+        {
+          extra: [
+            { color: "#1657FD", text: "Y" },
+            { color: "#3C4DD9", text: "r" },
+            { color: "#6344B5", text: "e" },
+            { color: "#893A91", text: "n" },
+          ],
+          clickEvent: { action: "suggest_command", value: "/msg Yren " },
+          hoverEvent: {
+            action: "show_text",
+            contents: {
+              extra: [
+                { color: "green", text: "World: " },
+                { color: "gray", text: "world\n" },
+                { color: "yellow", text: "Biome: " },
+                { color: "gold", text: "Cherry Grove\n" },
+                { color: "red", text: "Health: 20" },
+                { color: "gray", text: "/20\n" },
+                { color: "aqua", text: "Ping: " },
+                { color: "green", text: "44 " },
+                { color: "aqua", text: "ms" },
+              ],
+              text: "",
+            },
+          },
+          text: "",
+        },
+        {
+          extra: [{ color: "white", text: "check disc, I'll show ya lol" }],
+          text: ": ",
+        },
+      ],
+      text: "",
+    },
+  ],
+};
 
+const Parser = async (msg: NBTData): Promise<string> => {
   const colorParser = (data: NBTData, text: string = "") => {
     let str = "";
     if (data.bold) str += "{bold}";
     if (data.underlined) str += "{underlined}";
-    if (data.color && isColor(data.color)) {
+    if (data.color && data.color in colors) {
       str += `${colors[data.color]}${text}`;
     } else if (data.color?.startsWith("#")) {
       str += `{${data.color}-fg}${text}`;
@@ -187,7 +210,7 @@ const Parser = async (msg: NBTData): Promise<string> => {
 
   // translation loop
   if (msg.translate && msg.with) {
-    if (isTranslation(msg.translate)) {
+    if (msg.translate in translations) {
       const translation = translations[msg.translate];
       if (translation.includes("%s")) {
         let translated = translation;
@@ -206,7 +229,7 @@ const Parser = async (msg: NBTData): Promise<string> => {
       builder += msg.translate;
     }
   } else if (msg.translate && !msg.with) {
-    if (isTranslation(msg.translate)) {
+    if (msg.translate in translations) {
       const translation = translations[msg.translate];
       builder += translation;
     } else {
@@ -214,23 +237,27 @@ const Parser = async (msg: NBTData): Promise<string> => {
     }
   }
 
+  // default text loop
+  if (msg.text) {
+    builder += colorParser(msg, msg.text);
+  }
+
   // extras loop
-  else if (msg.extra) {
+  if (msg.extra) {
     for (const extra of msg.extra) {
       builder += await Parser(extra);
     }
   }
 
   // blank key loop
-  else if (Object.values(msg).length === 1) {
+  if (Object.values(msg).length === 1) {
     builder += Object.values(msg)[0].toString();
-  } else if (msg.text) {
-    builder += colorParser(msg, msg.text);
   }
 
   return builder;
 };
 
-Parser(msg).then(console.log);
-Parser(msg2).then(console.log);
-Parser(msg3).then(console.log);
+// Parser(msg).then(console.log);
+// Parser(msg2).then(console.log);
+// Parser(msg3).then(console.log);
+Parser(msg4).then(console.log);
