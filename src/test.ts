@@ -1,26 +1,6 @@
 import colors from "./lib/colors";
 import translations from "./lib/translations";
-
-type NBTData = {
-  italic?: boolean | number;
-  underlined?: boolean | number;
-  bold?: boolean | number;
-  obfuscated?: boolean | number;
-  strikethrough?: boolean | number;
-  color?: string;
-  text?: string;
-  extra?: NBTData[];
-  with?: NBTData[];
-  translate?: string;
-  insertion?: string;
-  clickEvent?: { action?: string; value?: string };
-  hoverEvent?: {
-    action?: string;
-    value?: string;
-    contents?: NBTData & { type?: string; id?: string; name?: string };
-  };
-  ""?: string;
-};
+import { NBTData } from "./lib/nbtData";
 
 const msg: NBTData = {
   translate: "%s",
@@ -191,7 +171,10 @@ const msg4: NBTData = {
   ],
 };
 
-const Parser = async (msg: NBTData): Promise<string> => {
+const msg5: NBTData = { translate: "<%s> %s", with: ["0x27", { text: "hi" }] };
+
+const chatParser = async (msg: NBTData): Promise<string> => {
+  const isString = (obj: any) => obj.constructor.name === "String";
   const colorParser = (data: NBTData, text: string = "") => {
     let str = "";
     if (data.bold) str += "{bold}";
@@ -207,6 +190,7 @@ const Parser = async (msg: NBTData): Promise<string> => {
   };
 
   let builder: string = "";
+  let hadWith = false;
 
   // translation loop
   if (msg.translate && msg.with) {
@@ -215,14 +199,18 @@ const Parser = async (msg: NBTData): Promise<string> => {
       if (translation.includes("%s")) {
         let translated = translation;
         for (const arg of msg.with) {
-          translated = translated.replace("%s", await Parser(arg));
+          if (isString(arg)) translated = translated.replace("%s", arg);
+          else translated = translated.replace("%s", await chatParser(arg));
+          hadWith = true;
         }
         builder += translated;
       }
     } else if (msg.translate.includes("%s")) {
       let translated = msg.translate;
       for (const arg of msg.with) {
-        translated = translated.replace("%s", await Parser(arg));
+        if (isString(arg)) translated = translated.replace("%s", arg);
+        else translated = translated.replace("%s", await chatParser(arg));
+        hadWith = true;
       }
       builder += translated;
     } else {
@@ -238,14 +226,14 @@ const Parser = async (msg: NBTData): Promise<string> => {
   }
 
   // default text loop
-  if (msg.text) {
+  if (msg.text && !hadWith) {
     builder += colorParser(msg, msg.text);
   }
 
   // extras loop
   if (msg.extra) {
     for (const extra of msg.extra) {
-      builder += await Parser(extra);
+      builder += await chatParser(extra);
     }
   }
 
@@ -260,4 +248,5 @@ const Parser = async (msg: NBTData): Promise<string> => {
 // Parser(msg).then(console.log);
 // Parser(msg2).then(console.log);
 // Parser(msg3).then(console.log);
-Parser(msg4).then(console.log);
+// Parser(msg4).then(console.log);
+chatParser(msg5).then(console.log);

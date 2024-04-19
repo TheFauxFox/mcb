@@ -13,13 +13,34 @@ function sleep(ms: number) {
 }
 
 const createBot = async () => {
-  const bot = mineflayer.createBot({
-    host: process.env.SERVER ?? "localhost",
-    username: process.env.EMAIL ?? "",
-    password: process.env.PASSWORD ?? "",
-    auth: "microsoft",
-    defaultChatPatterns: false,
-  });
+  let bot = null;
+  try {
+    bot = mineflayer.createBot({
+      host: process.env.SERVER ?? "localhost",
+      username: process.env.EMAIL ?? "",
+      password: process.env.PASSWORD ?? "",
+      auth: "microsoft",
+      defaultChatPatterns: false,
+      checkTimeoutInterval: 300 * 1000,
+    });
+    bot.on("error", console.error);
+  } catch (e) {
+    if (process.env.RECONNECT === "true") {
+      console.log("Reconnecting...");
+      await sleep(1000);
+      await createBot();
+      return;
+    } else {
+      screen.exit();
+      console.log(e);
+      process.exit(1);
+    }
+  }
+
+  if (bot == null) {
+    screen.exit();
+    process.exit(1);
+  }
 
   bot.once("spawn", () => {
     screen.addChatLine("Logged in!");
@@ -32,23 +53,24 @@ const createBot = async () => {
     }
   });
 
-  bot.on("kicked", async () => {
+  bot.on("kicked", async (reason) => {
     if (process.env.RECONNECT === "true") {
+      screen.addChatLine(`Disconnected.`);
+      screen.addChatLine(
+        `Reconnecting in ${process.env.RECONNECT_TIME} seconds...`
+      );
       bot.end();
-      await sleep(parseInt(process.env.RECONNECT_TIME ?? "3") * 1000);
-      createBot();
     }
   });
 
   bot.on("error", async (err) => {
     screen.exit();
-    bot.end(err.message);
     console.error(err);
+    process.exit(1);
   });
 
   bot.on("end", async () => {
     if (process.env.RECONNECT === "true") {
-      bot.end();
       await sleep(parseInt(process.env.RECONNECT_TIME ?? "3") * 1000);
       createBot();
     }

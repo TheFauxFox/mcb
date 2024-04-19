@@ -7,7 +7,7 @@ export type NBTData = {
   color?: string;
   text?: string;
   extra?: NBTData[];
-  with?: NBTData[];
+  with?: any[];
   translate?: string;
   insertion?: string;
   clickEvent?: { action?: string; value?: string };

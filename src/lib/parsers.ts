@@ -3,6 +3,7 @@ import { NBTData } from "./nbtData";
 import translations from "./translations";
 
 export default async function chatParser(msg: NBTData): Promise<string> {
+  const isString = (obj: any) => obj.constructor.name === "String";
   const colorParser = (data: NBTData, text: string = "") => {
     let str = "";
     if (data.bold) str += "{bold}";
@@ -26,18 +27,20 @@ export default async function chatParser(msg: NBTData): Promise<string> {
       if (translation.includes("%s")) {
         let translated = translation;
         for (const arg of msg.with) {
-          translated = translated.replace("%s", await chatParser(arg));
+          if (isString(arg)) translated = translated.replace("%s", arg);
+          else translated = translated.replace("%s", await chatParser(arg));
         }
-        builder += translated;
+        builder += colorParser(msg, translated);
       }
     } else if (msg.translate.includes("%s")) {
       let translated = msg.translate;
       for (const arg of msg.with) {
-        translated = translated.replace("%s", await chatParser(arg));
+        if (isString(arg)) translated = translated.replace("%s", arg);
+        else translated = translated.replace("%s", await chatParser(arg));
       }
-      builder += translated;
+      builder += colorParser(msg, translated);
     } else {
-      builder += msg.translate;
+      builder += colorParser(msg, msg.translate);
     }
   } else if (msg.translate && !msg.with) {
     if (msg.translate in translations) {
@@ -61,8 +64,8 @@ export default async function chatParser(msg: NBTData): Promise<string> {
   }
 
   // blank key loop
-  if (Object.values(msg).length === 1) {
-    builder += Object.values(msg)[0].toString();
+  if (msg[""]) {
+    builder += msg[""];
   }
 
   return builder;
