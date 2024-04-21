@@ -1,26 +1,47 @@
 {
-  "name": "mcb",
+  "name": "minecraft-console-bot",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     ".": "tsx src/index.ts",
-    "test": "tsx src/test.ts"
+    "test": "tsx src/test.ts",
+    "clean": "rimraf build/ dist/",
+    "tsc": "tsc",
+    "bundle": "webpack",
+    "esbuild": "esbuild ./src/index.ts --bundle --outfile=bundle.cjs --format=cjs --platform=node --external:pty.js --external:term.js",
+    "compile": "pkg -t node18-linux,node18-win --compress GZip build/bundle.js --out-path dist/",
+    "build": "npm run clean && npm run bundle && npm run compile",
+    "rollup": "rollup -c rollup.config.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "argparse": "^2.0.1",
     "blessed": "^0.1.81",
-    "dotenv": "^16.4.5",
     "mineflayer": "^4.20.1"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/argparse": "^2.0.16",
     "@types/blessed": "^0.1.25",
     "@types/node": "^20.12.7",
-    "@types/terminal-kit": "^2.5.6",
+    "@yao-pkg/pkg-fetch": "^3.5.9",
+    "esbuild": "^0.20.2",
+    "pkg": "^5.8.1",
     "prettier": "^3.2.5",
+    "rimraf": "^5.0.5",
+    "rollup": "^4.15.0",
+    "terser-webpack-plugin": "^5.3.10",
+    "ts-loader": "^9.5.1",
     "tsx": "^4.7.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "uglify-js": "^3.17.4",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
   }
 }
