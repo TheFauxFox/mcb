@@ -1,10 +1,41 @@
 import mineflayer from "mineflayer";
-import { config } from "dotenv";
 import chatParser from "./lib/parsers";
 import Screen from "./screen";
+import { ArgumentParser } from "argparse";
 
-config();
-const screen = new Screen("Minecraft Chat");
+const parser = new ArgumentParser({
+  description: "Minecraft Console Chat Client",
+});
+
+parser.add_argument("-u", "--username", {
+  help: "Minecraft email for Microsoft",
+  required: true,
+  type: String,
+});
+parser.add_argument("-p", "--password", {
+  help: "Minecraft password",
+  required: true,
+  type: String,
+});
+parser.add_argument("-s", "--server", {
+  help: "Server IP",
+  required: true,
+  type: String,
+});
+parser.add_argument("-r", "--reconnect", {
+  help: "Enable autoreconnect",
+  required: false,
+  type: Boolean,
+  default: false,
+});
+parser.add_argument("-t", "--reconnect-time", {
+  help: "Seconds before reconnecting",
+  required: false,
+  type: Number,
+  default: 3,
+});
+
+const args = parser.parse_args();
 
 function sleep(ms: number) {
   return new Promise((resolve) => {
@@ -16,9 +47,9 @@ const createBot = async () => {
   let bot = null;
   try {
     bot = mineflayer.createBot({
-      host: process.env.SERVER ?? "localhost",
-      username: process.env.EMAIL ?? "",
-      password: process.env.PASSWORD ?? "",
+      host: args.server,
+      username: args.username,
+      password: args.password,
       auth: "microsoft",
       defaultChatPatterns: false,
       checkTimeoutInterval: 300 * 1000,
@@ -54,11 +85,9 @@ const createBot = async () => {
   });
 
   bot.on("kicked", async (reason) => {
-    if (process.env.RECONNECT === "true") {
+    if (args.reconnect === "true") {
       screen.addChatLine(`Disconnected.`);
-      screen.addChatLine(
-        `Reconnecting in ${process.env.RECONNECT_TIME} seconds...`
-      );
+      screen.addChatLine(`Reconnecting in ${args.reconnect_time} seconds...`);
       bot.end();
     }
   });
@@ -70,8 +99,8 @@ const createBot = async () => {
   });
 
   bot.on("end", async () => {
-    if (process.env.RECONNECT === "true") {
-      await sleep(parseInt(process.env.RECONNECT_TIME ?? "3") * 1000);
+    if (args.reconnect === "true") {
+      await sleep(parseInt(args.reconnect_time ?? "3") * 1000);
       createBot();
     }
   });
@@ -102,5 +131,5 @@ const createBot = async () => {
     screen._screen.render();
   });
 };
-
+const screen = new Screen("Minecraft Chat");
 createBot();
