@@ -119,16 +119,18 @@ const createBot = async () => {
   });
 
   bot.on("time", async () => {
-    await screen.updatePlayerList(bot.players);
-    await screen.updateServerInfo({
-      username: bot.username,
-      ping: bot.player.ping.toString(),
-      version: bot.version,
-      time: bot.time.timeOfDay.toString(),
-      health: bot.health.toString(),
-      hunger: bot.food.toString(),
-    });
-    screen._screen.render();
+    try {
+      await screen.updatePlayerList(bot.players);
+      await screen.updateServerInfo({
+        username: bot.username,
+        ping: bot.player.ping.toString(),
+        version: bot.version,
+        time: bot.time.timeOfDay.toString(),
+        health: bot.health.toString(),
+        hunger: bot.food.toString(),
+      });
+      screen._screen.render();
+    } catch (_) {}
   });
 };
 const screen = new Screen("Minecraft Chat");

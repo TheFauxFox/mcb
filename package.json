@@ -1,25 +1,30 @@
 {
-  "name": "mcb",
+  "name": "minecraft-console-bot",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     ".": "tsx src/index.ts",
-    "test": "tsx src/test.ts"
+    "clean": "rimraf build/ dist/",
+    "build": "npm run clean && tsc && npm run compile",
+    "compile": "pkg -t node18-linux,node18-win --no-bytecode --public-packages '*' --public --compress GZip ./build/tsc/index.js --out-path dist/",
+    "rename": ""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "argparse": "^2.0.1",
     "blessed": "^0.1.81",
-    "dotenv": "^16.4.5",
     "mineflayer": "^4.20.1"
   },
   "devDependencies": {
+    "@types/argparse": "^2.0.16",
     "@types/blessed": "^0.1.25",
     "@types/node": "^20.12.7",
-    "@types/terminal-kit": "^2.5.6",
+    "pkg": "^5.8.1",
     "prettier": "^3.2.5",
+    "rimraf": "^5.0.5",
     "tsx": "^4.7.2",
     "typescript": "^5.4.5"
   }
