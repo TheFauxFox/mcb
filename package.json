@@ -6,9 +6,9 @@
   "scripts": {
     ".": "tsx src/index.ts",
     "clean": "rimraf build/ dist/",
-    "build": "npm run clean && tsc && npm run compile",
-    "compile": "pkg -t node18-linux,node18-win --no-bytecode --public-packages '*' --public --compress GZip ./build/tsc/index.js --out ./dist/MinecraftConsoleBot",
-    "rename": ""
+    "lint": "prettier -c src/**/* && eslint --fix src/**/*",
+    "compile": "pkg -t node18-linux,node18-win --no-bytecode --public-packages '*' --public -C GZip ./build/tsc/index.js -o ./dist/MinecraftConsoleBot",
+    "build": "npm run clean && tsc && npm run compile"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +22,9 @@
     "@types/argparse": "^2.0.16",
     "@types/blessed": "^0.1.25",
     "@types/node": "^20.12.7",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
+    "eslint": "^8.57.0",
     "pkg": "^5.8.1",
     "prettier": "^3.2.5",
     "rimraf": "^5.0.5",

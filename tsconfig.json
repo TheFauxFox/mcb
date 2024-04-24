@@ -1,14 +1,14 @@
 {
-    "compilerOptions": {
-        "target": "ESNext",
-        "module": "CommonJS",
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
-        "strict": true,
-        "skipLibCheck": true,
-        "outDir": "./build/tsc",
-        "jsx": "react",
-        "moduleResolution": "node",
-        "resolveJsonModule": true
-    }
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "./build/tsc",
+    "jsx": "react",
+    "moduleResolution": "node",
+    "resolveJsonModule": true
+  }
 }
