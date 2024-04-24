@@ -2,6 +2,8 @@ import mineflayer from 'mineflayer';
 import chatParser from './lib/parsers';
 import Screen from './screen';
 import { ArgumentParser } from 'argparse';
+import { sleep } from './lib/time';
+import { tpsGetter } from './lib/serverHacks';
 
 const parser = new ArgumentParser({
 	description: 'Minecraft Console Chat Client',
@@ -49,12 +51,6 @@ parser.add_argument('-d', '--debug', {
 
 const args = parser.parse_args();
 
-function sleep(ms: number) {
-	return new Promise((resolve) => {
-		setTimeout(resolve, ms);
-	});
-}
-
 const createBot = async () => {
 	let bot = null;
 	try {
@@ -79,6 +75,7 @@ const createBot = async () => {
 			process.exit(1);
 		}
 	}
+	const tps = new tpsGetter();
 
 	if (bot == null) {
 		screen.exit();
@@ -90,6 +87,9 @@ const createBot = async () => {
 	});
 
 	bot.on('message', async (msg, position) => {
+		if (args.debug) {
+			screen.log(`[DEBUG] ${JSON.stringify(msg)} | ${position}`);
+		}
 		if (position == 'system' || position == 'chat') {
 			if (args.debug) {
 				screen.log(JSON.stringify(msg.json));
@@ -98,10 +98,9 @@ const createBot = async () => {
 		}
 	});
 
-	bot.on('kicked', async (reason) => {
+	bot.on('kicked', async () => {
 		if (args.reconnect === 'true') {
-			screen.addChatLine(`Disconnected.`);
-			screen.addChatLine(`Reconnecting in ${args.reconnect_time} seconds...`);
+			screen.addChatLine(`{green-fg}You've been kicked!{/}`);
 			bot.end();
 		}
 	});
@@ -114,6 +113,8 @@ const createBot = async () => {
 
 	bot.on('end', async () => {
 		if (args.reconnect === 'true') {
+			screen.addChatLine(`Disconnected.`);
+			screen.addChatLine(`Reconnecting in ${args.reconnect_time} seconds...`);
 			await sleep(parseInt(args.reconnect_time ?? '3') * 1000);
 			createBot();
 		}
@@ -125,14 +126,20 @@ const createBot = async () => {
 				bot.quit('Disconnected.');
 				screen.exit();
 				process.exit(0);
+			} else if (text.match(/^:reco/i)) {
+				bot.quit('Reconnecting');
+				screen.addChatLine('{red-fg}Reconnecting...{/}');
+				createBot();
+			} else {
+				bot.chat(text);
 			}
-			bot.chat(text);
 			screen.inputBar.setValue('');
 			screen.inputBar.focus();
 		}
 	});
 
 	bot.on('time', async () => {
+		tps.tickIngameTime(bot.time.age);
 		try {
 			await screen.updatePlayerList(bot.players);
 			await screen.updateServerInfo({
@@ -142,9 +149,12 @@ const createBot = async () => {
 				time: bot.time.timeOfDay.toString(),
 				health: bot.health.toString(),
 				hunger: bot.food.toString(),
+				tps: tps.getTps().toString(),
 			});
 			screen._screen.render();
-		} catch (_) {}
+		} catch (_) {
+			/* empty */
+		}
 	});
 };
 const screen = new Screen('Minecraft Chat', args.log_dir);

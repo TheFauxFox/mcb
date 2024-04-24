@@ -10,5 +10,15 @@
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "src/test/**/*"
+      ],
+      "env": {
+        "jest": true
+      }
+    }
   ]
 }

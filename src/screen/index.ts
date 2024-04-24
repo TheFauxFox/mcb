@@ -4,6 +4,7 @@ import { mkdirSync } from 'fs';
 import { appendFile } from 'fs/promises';
 import path from 'path';
 import chatParser from '../lib/parsers';
+import { getDateStamp, getTimeStamp, mcTimeToHRT } from '../lib/time';
 
 export default class Screen {
 	_screen: blessed.Widgets.Screen;
@@ -103,19 +104,12 @@ export default class Screen {
 		this.log(msg.replace(/\{(.*?-fg|bold|underlined|\/)\}/gi, ''));
 	}
 
-	getDateTimeStamp() {
-		return new Date().toLocaleString(Intl.DateTimeFormat().resolvedOptions().locale, {
-			hour: '2-digit',
-			hour12: false,
-			minute: '2-digit',
-			second: '2-digit',
-		});
-	}
-
 	async log(msg: string) {
-		const tzoffset = new Date().getTimezoneOffset() * 60000;
-		const localDate = new Date(Date.now() - tzoffset).toISOString().split('T')[0];
-		await appendFile(`${this.logDir}/${localDate}.txt`, `${msg}\r\n`, 'utf8');
+		await appendFile(
+			`${this.logDir}/${getDateStamp()}.txt`,
+			`[${getTimeStamp()}] ${msg}\r\n`,
+			'utf8'
+		);
 	}
 
 	onMessage(listener: (message: string) => void | Promise<void>) {
@@ -134,20 +128,14 @@ export default class Screen {
 		this.playerList.setLabel(`Players (${Object.values(players).length})`);
 	}
 
-	fixTime = (time: number): string => {
-		const ratio = 1000 / 60;
-		const t = Math.round((time + 6000) % 24000);
-		const hour = Math.floor(t / 1000);
-		const minute = Math.round((t % 1000) / ratio);
-		return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-	};
-
 	async updateServerInfo(info: { [key: string]: string }) {
-		this.serverInfoBox.setLine(0, `Logged in as ${info.username}`);
-		this.serverInfoBox.setLine(1, `Version: ${info.version}`);
-		this.serverInfoBox.setLine(2, `Ping: ${info.ping}ms`);
-		this.serverInfoBox.setLine(3, `Time: ${this.fixTime(parseInt(info.time))}`);
-		this.serverInfoBox.setLine(4, `Health: ${info.health}/20`);
-		this.serverInfoBox.setLine(5, `Hunger: ${info.hunger}/20`);
+		let i = -1;
+		this.serverInfoBox.setLine(i++, `Logged in as ${info.username}`);
+		this.serverInfoBox.setLine(i++, `Version: ${info.version}`);
+		this.serverInfoBox.setLine(i++, `TPS: ${info.tps}`);
+		this.serverInfoBox.setLine(i++, `Ping: ${info.ping}ms`);
+		this.serverInfoBox.setLine(i++, `Time: ${mcTimeToHRT(parseInt(info.time))}`);
+		this.serverInfoBox.setLine(i++, `Health: ${info.health}/20`);
+		this.serverInfoBox.setLine(i++, `Hunger: ${info.hunger}/20`);
 	}
 }
