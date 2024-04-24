@@ -103,12 +103,19 @@ export default class Screen {
 		this.log(msg.replace(/\{(.*?-fg|bold|underlined|\/)\}/gi, ''));
 	}
 
+	getDateTimeStamp() {
+		return new Date().toLocaleString(Intl.DateTimeFormat().resolvedOptions().locale, {
+			hour: '2-digit',
+			hour12: false,
+			minute: '2-digit',
+			second: '2-digit',
+		});
+	}
+
 	async log(msg: string) {
-		await appendFile(
-			`${this.logDir}/${new Date().toISOString().split('T')[0]}.txt`,
-			`${msg}\r\n`,
-			'utf8'
-		);
+		const tzoffset = new Date().getTimezoneOffset() * 60000;
+		const localDate = new Date(Date.now() - tzoffset).toISOString().split('T')[0];
+		await appendFile(`${this.logDir}/${localDate}.txt`, `${msg}\r\n`, 'utf8');
 	}
 
 	onMessage(listener: (message: string) => void | Promise<void>) {

@@ -41,7 +41,7 @@ parser.add_argument('-l', '--log-dir', {
 	default: './logs',
 });
 parser.add_argument('-d', '--debug', {
-	help: 'Enable debug output in logs',
+	help: 'Enable debug raw json messages in logs',
 	required: false,
 	type: Boolean,
 	default: false,
