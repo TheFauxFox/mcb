@@ -100,7 +100,7 @@ export default class Screen {
     this.chatBox.pushLine(msg);
     this._screen.render();
     this.chatBox.setScrollPerc(100);
-    this.log(msg);
+    this.log(msg.replace(/\{(.*?-fg|bold|underlined|\/)\}/gi, ""));
   }
 
   async log(msg: string) {

@@ -7,7 +7,7 @@
     ".": "tsx src/index.ts",
     "clean": "rimraf build/ dist/",
     "build": "npm run clean && tsc && npm run compile",
-    "compile": "pkg -t node18-linux,node18-win --no-bytecode --public-packages '*' --public --compress GZip ./build/tsc/index.js --out-path dist/",
+    "compile": "pkg -t node18-linux,node18-win --no-bytecode --public-packages '*' --public --compress GZip ./build/tsc/index.js --out ./dist/MinecraftConsoleBot",
     "rename": ""
   },
   "keywords": [],

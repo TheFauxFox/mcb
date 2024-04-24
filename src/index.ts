@@ -34,6 +34,18 @@ parser.add_argument("-t", "--reconnect-time", {
   type: Number,
   default: 3,
 });
+parser.add_argument("-l", "--log-dir", {
+  help: "Log directory",
+  required: false,
+  type: String,
+  default: "./logs",
+});
+parser.add_argument("-d", "--debug", {
+  help: "Enable debug output in logs",
+  required: false,
+  type: Boolean,
+  default: false,
+});
 
 const args = parser.parse_args();
 
@@ -79,7 +91,9 @@ const createBot = async () => {
 
   bot.on("message", async (msg, position) => {
     if (position == "system" || position == "chat") {
-      screen.log(JSON.stringify(msg.json));
+      if (args.debug) {
+        screen.log(JSON.stringify(msg.json));
+      }
       screen.addChatLine(await chatParser(msg.json));
     }
   });
@@ -133,5 +147,5 @@ const createBot = async () => {
     } catch (_) {}
   });
 };
-const screen = new Screen("Minecraft Chat");
+const screen = new Screen("Minecraft Chat", args.log_dir);
 createBot();
