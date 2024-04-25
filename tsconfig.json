@@ -9,6 +9,10 @@
     "outDir": "./build/js",
     "jsx": "react",
     "moduleResolution": "node",
-    "resolveJsonModule": true
-  }
+    "resolveJsonModule": true,
+  },
+  "exclude": [
+    "./node_modules",
+    "./src/test"
+  ]
 }
