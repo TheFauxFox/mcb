@@ -49,8 +49,15 @@ parser.add_argument('-d', '--debug', {
 	type: Boolean,
 	default: false,
 });
+parser.add_argument('-H', '--history-dir', {
+	help: 'Where to place the chat history file (defaults to log directory)',
+	required: false,
+	type: String,
+	default: '',
+});
 
 const args = parser.parse_args();
+const screen = new Screen('Minecraft Chat', args.log_dir, args.history_dir, args.debug);
 
 const createBot = async () => {
 	let bot = null;
@@ -129,6 +136,7 @@ const createBot = async () => {
 
 	screen.onMessage(async (text) => {
 		if (text.length > 0) {
+			screen.history.add(text);
 			if (text.match(/^:exit/i)) {
 				bot.quit('Disconnected.');
 				screen.exit();
@@ -164,5 +172,4 @@ const createBot = async () => {
 		}
 	});
 };
-const screen = new Screen('Minecraft Chat', args.log_dir);
 createBot();

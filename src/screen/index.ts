@@ -6,6 +6,7 @@ import { appendFile } from 'fs/promises';
 import path from 'path';
 import chatParser from '../lib/parsers';
 import { getDateStamp, getTimeStamp, mcTimeToHRT } from '../lib/time';
+import HistoryManager from '../lib/history';
 
 export default class Screen {
 	_screen: blessed.Widgets.Screen;
@@ -22,11 +23,15 @@ export default class Screen {
 	serverInfoBox!: blessed.Widgets.ScrollableBoxElement;
 	logDir: string;
 	playerBoxWidth: number;
+	debug: boolean;
+	history: HistoryManager;
 
-	constructor(name: string, logDir: string = './logs') {
+	constructor(name: string, logDir: string = './logs', historyDir: string = '', debug = false) {
 		this._screen = blessed.screen({
 			smartCSR: true,
 			title: name,
+			terminal: 'xterm-256color',
+			ignoreLocked: ['C-c'],
 		});
 		this.defaultOptions = {
 			tags: true,
@@ -39,12 +44,15 @@ export default class Screen {
 		this.playerBoxWidth = 44;
 
 		this.addWidgets();
-		this._screen.key(['C-c'], this.exit);
-		this.playerList.key(['C-c'], this.exit);
-		this.inputBar.key(['C-c'], this.exit);
-		this.chatBox.key(['C-c'], this.exit);
 		this.inputBar.focus();
+		this._screen.key(['C-c'], () => this.exit());
+		this.inputBar.key(['up', 'down'], (ch, key) => this.handleKeys(ch, key));
 		this.logDir = path.resolve(logDir);
+		this.debug = debug;
+		if (historyDir == '') {
+			historyDir = this.logDir;
+		}
+		this.history = new HistoryManager(historyDir);
 		mkdirSync(this.logDir, { recursive: true });
 	}
 
@@ -92,6 +100,7 @@ export default class Screen {
 			keys: true,
 			mouse: true,
 			inputOnFocus: true,
+			ignoreLocked: ['up', 'down'],
 			label: 'Send a message',
 			...this.defaultOptions,
 		});
@@ -102,11 +111,23 @@ export default class Screen {
 		this._screen.append(this.playerList);
 	}
 
+	handleKeys(ch: string, key: blessed.Widgets.Events.IKeyEventArg) {
+		switch (key.name) {
+			case 'up':
+				this.inputBar.setValue(this.history.back());
+				break;
+			case 'down':
+				this.inputBar.setValue(this.history.forward());
+				break;
+		}
+		this._screen.render();
+	}
+
 	async addChatLine(msg: string) {
 		this.chatBox.pushLine(msg);
-		this._screen.render();
 		this.chatBox.setScrollPerc(100);
-		this.log(msg.replace(/\{(.*?-fg|bold|underlined|\/)\}/gi, ''));
+		this._screen.render();
+		this.log(this.debug ? msg : msg.replace(/\{(.*?-fg|bold|underlined|\/)\}/gi, ''));
 	}
 
 	async log(msg: string) {
@@ -123,6 +144,7 @@ export default class Screen {
 
 	exit() {
 		this._screen.destroy();
+		process.exit(0);
 	}
 
 	async updatePlayerList(players: { [username: string]: mineflayer.Player }) {

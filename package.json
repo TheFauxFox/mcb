@@ -8,7 +8,7 @@
     "test": "jest",
     "clean": "rimraf build/ dist/",
     "lint": "prettier -c src/**/* && eslint src/**/*",
-    "compile": "pkg -t node18-linux,node18-win --no-bytecode --public-packages '*' --public -C GZip ./build/tsc/index.js -o ./dist/MinecraftConsoleBot",
+    "compile": "pkg -t node18-linux,node18-win --no-bytecode --public-packages '*' --public -C GZip -c ./package.json ./build/js/index.js -o ./build/MinecraftConsoleBot",
     "build": "npm run clean && tsc && npm run compile",
     "ci": "npm run lint && npm run test"
   },
@@ -33,7 +33,10 @@
     "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
     "ts-jest": "^29.1.2",
-    "tsx": "^4.7.2",
+    "tsx": "^4.7.3",
     "typescript": "^5.4.5"
+  },
+  "pkg": {
+    "assets": "node_modules/blessed/**/*"
   }
 }

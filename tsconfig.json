@@ -6,7 +6,7 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "outDir": "./build/tsc",
+    "outDir": "./build/js",
     "jsx": "react",
     "moduleResolution": "node",
     "resolveJsonModule": true
