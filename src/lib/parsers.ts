@@ -70,3 +70,19 @@ export default async function chatParser(msg: NBTData): Promise<string> {
 
 	return builder;
 }
+
+export const pingParser = (ping: number): string => {
+	let hex = '';
+	let pingStr = ping.toString();
+	const max = 600;
+	const red = (ping / max) * 255;
+	const green = ((max - ping) / max) * 255;
+	hex = '#' + ((1 << 24) | (red << 16) | (green << 8)).toString(16).slice(1);
+	if (ping >= 10000) {
+		pingStr = '9999';
+	}
+	if (pingStr.length < 4) {
+		pingStr = pingStr.padStart(4, ' ');
+	}
+	return `{${hex}-fg}${pingStr}ms{/}`;
+};

@@ -4,6 +4,7 @@ import Screen from './screen';
 import { ArgumentParser } from 'argparse';
 import { sleep } from './lib/time';
 import { tpsGetter } from './lib/serverHacks';
+import { NBTData } from './lib/nbtData';
 
 const parser = new ArgumentParser({
 	description: 'Minecraft Console Chat Client',
@@ -94,7 +95,13 @@ const createBot = async () => {
 			if (args.debug) {
 				screen.log(JSON.stringify(msg.json));
 			}
-			screen.addChatLine(await chatParser(msg.json));
+			if ('unsigned' in msg) {
+				screen.addChatLine(
+					await chatParser((msg as { unsigned: { json: NBTData } }).unsigned.json as NBTData)
+				);
+			} else {
+				screen.addChatLine(await chatParser(msg.json));
+			}
 		}
 	});
 

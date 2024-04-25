@@ -1,3 +1,4 @@
+import { pingParser } from './../lib/parsers';
 import mineflayer from 'mineflayer';
 import blessed from 'blessed';
 import { mkdirSync } from 'fs';
@@ -20,6 +21,7 @@ export default class Screen {
 	inputBar!: blessed.Widgets.TextboxElement;
 	serverInfoBox!: blessed.Widgets.ScrollableBoxElement;
 	logDir: string;
+	playerBoxWidth: number;
 
 	constructor(name: string, logDir: string = './logs') {
 		this._screen = blessed.screen({
@@ -33,6 +35,9 @@ export default class Screen {
 			border: { type: 'line' },
 			style: { fg: 'white', bg: 'black', border: { fg: 'white' } },
 		};
+
+		this.playerBoxWidth = 44;
+
 		this.addWidgets();
 		this._screen.key(['C-c'], this.exit);
 		this.playerList.key(['C-c'], this.exit);
@@ -48,7 +53,7 @@ export default class Screen {
 		this.chatBox = blessed.box({
 			top: 0,
 			left: 0,
-			width: '80%',
+			width: `100%-${this.playerBoxWidth}`,
 			height: '100%-3',
 			label: 'Chat',
 			alwaysScroll: true,
@@ -59,8 +64,8 @@ export default class Screen {
 		// @ts-expect-error Falsely claims that types will fail, but it doesn't.
 		this.playerList = blessed.list({
 			top: 0,
-			left: '80%',
-			width: '20%',
+			left: `100%-${this.playerBoxWidth}`,
+			width: this.playerBoxWidth,
 			height: '70%',
 			label: 'Players',
 			...this.defaultOptions,
@@ -68,9 +73,9 @@ export default class Screen {
 
 		// @ts-expect-error Falsely claims that types will fail, but it doesn't.
 		this.serverInfoBox = blessed.box({
-			left: '80%',
+			left: `100%-${this.playerBoxWidth}`,
 			top: '70%',
-			width: '20%',
+			width: this.playerBoxWidth,
 			height: '31%',
 			label: 'Server Info',
 			alwaysScroll: true,
@@ -83,7 +88,7 @@ export default class Screen {
 			bottom: 0,
 			left: 0,
 			height: 3,
-			width: '80%',
+			width: `100%-${this.playerBoxWidth}`,
 			keys: true,
 			mouse: true,
 			inputOnFocus: true,
@@ -123,7 +128,9 @@ export default class Screen {
 	async updatePlayerList(players: { [username: string]: mineflayer.Player }) {
 		this.playerList.clearItems();
 		for (const player of Object.values(players)) {
-			this.playerList.addItem(await chatParser(player.displayName.json));
+			this.playerList.addItem(
+				`${pingParser(player.ping)} | ${await chatParser(player.displayName.json)}`
+			);
 		}
 		this.playerList.setLabel(`Players (${Object.values(players).length})`);
 	}
