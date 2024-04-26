@@ -6,9 +6,9 @@
   "scripts": {
     ".": "tsx src/index.ts",
     "test": "jest",
-    "clean": "rimraf build/ dist/",
+    "clean": "rimraf build/",
     "lint": "prettier -c src/**/* && eslint src/**/*",
-    "compile": "pkg -t node18-linux,node18-win --no-bytecode --public-packages '*' --public -C GZip -c ./package.json ./build/js/index.js -o ./build/MinecraftConsoleBot --options='no-warnings=true'",
+    "compile": "pkg -t node18-linux,node18-win --no-bytecode --public-packages '*' --public -C GZip -c ./package.json ./build/src/index.js -o ./build/dist/MinecraftConsoleBot --options='no-warnings=true'",
     "build": "npm run clean && tsc && npm run compile",
     "ci": "npm run lint && npm run test && npm run build"
   },

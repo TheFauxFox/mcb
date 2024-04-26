@@ -35,5 +35,5 @@ jobs:
         with:
           name: 'MinecraftConsoleBot v${{steps.package_name.outputs.VERSION}}'
           files: |
-            build/MinecraftConsoleBot-linux
-            build/MinecraftConsoleBot-win.exe
+            build/dist/MinecraftConsoleBot-linux
+            build/dist/MinecraftConsoleBot-win.exe
