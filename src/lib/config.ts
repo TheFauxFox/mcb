@@ -35,7 +35,6 @@ export default class Config {
       this.continue = false;
     } else {
       this.config = toml.parse(readFileSync(path, 'utf8'));
-      console.log(JSON.stringify(this.config, null, 2));
       this.continue = true;
     }
   }

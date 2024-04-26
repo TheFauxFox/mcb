@@ -52,6 +52,7 @@ export default class Screen {
     this.debug = config.debug ?? false;
     this.history = new HistoryManager(config.historyDir ?? this.logDir);
     mkdirSync(this.logDir, { recursive: true });
+    this._screen.render();
   }
 
   addWidgets() {

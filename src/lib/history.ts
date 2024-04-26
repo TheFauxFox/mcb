@@ -8,10 +8,10 @@ export default class HistoryManager {
 
   constructor(histDir: string) {
     this.history = [];
-    this.index = 0;
     this.logDir = histDir;
     mkdirSync(histDir, { recursive: true });
     this.loadHistory();
+    this.index = this.history.length;
   }
 
   loadHistory() {
