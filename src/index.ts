@@ -6,6 +6,7 @@ import { sleep } from './lib/time';
 import { tpsGetter } from './lib/serverHacks';
 import { NBTData } from './lib/nbtData';
 import Config from './lib/config';
+import { version } from '../package.json';
 
 const parser = new ArgumentParser({
   description: 'Minecraft Console Chat Client',
@@ -17,6 +18,8 @@ parser.add_argument('-c', '--config', {
   type: String,
   default: './bot.toml',
 });
+
+parser.add_argument('-v', '--version', { action: 'version', version });
 
 const args = parser.parse_args();
 
