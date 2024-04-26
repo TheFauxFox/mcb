@@ -128,8 +128,8 @@ const createBot = async (screen: Screen) => {
   bot.on('end', async () => {
     if (cfg.config.reconnect) {
       screen.addChatLine(`Disconnected.`);
-      screen.addChatLine(`Reconnecting in ${cfg.config.reconnect_time} seconds...`);
-      await sleep(cfg.config.reconnect_time ?? 3000);
+      screen.addChatLine(`Reconnecting in ${cfg.config.reconnectTime} seconds...`);
+      await sleep(cfg.config.reconnectTime ?? 3000);
       createBot(screen);
     }
   });

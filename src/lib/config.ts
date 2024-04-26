@@ -6,7 +6,7 @@ export type IConfig = {
   password: string;
   server: string;
   reconnect?: boolean;
-  reconnect_time?: number;
+  reconnectTime?: number;
   debug?: boolean;
   logDir?: string;
   historyDir?: string;
@@ -30,7 +30,7 @@ export default class Config {
       console.error(`Creating new config at ${path}, please fill in the required fields.`);
       writeFileSync(
         path,
-        `email = "minecraft.account@example.com" # Microsoft email for Minecraft account\npassword = "Password123!"               # Password for Minecraft account\nserver = "play.example.com"             # IP Address of the server\n\n###############################\n# Everything else is optional #\n# Shown args are defaults     #\n###############################\n\nreconnect_delay = 5   # Seconds to wait before reconnecting\nreconnect = false     # Should we reconnect after disconnect/kick?\nlogDir = "./logs"     # Directory to place logs for this bot\nhistoryDir = "./logs" # Where should we place our .hist file for scrollback\ndebug = false # Spam logs with debug info`
+        `email = "minecraft.account@example.com" # Microsoft email for Minecraft account\npassword = "Password123!"               # Password for Minecraft account\nserver = "play.example.com"             # IP Address of the server\n\n###############################\n# Everything else is optional #\n# Shown args are defaults     #\n###############################\n\nreconnectDelay = 5    # Seconds to wait before reconnecting\nreconnect = false     # Should we reconnect after disconnect/kick?\nlogDir = "./logs"     # Directory to place logs for this bot\nhistoryDir = "./logs" # Where should we place our .hist file for scrollback\ndebug = false         # Spam logs with debug info`
       );
       this.continue = false;
     } else {
