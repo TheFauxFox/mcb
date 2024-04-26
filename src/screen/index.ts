@@ -47,7 +47,7 @@ export default class Screen {
     this.addWidgets();
     this.inputBar.focus();
     this._screen.key(['C-c'], () => this.exit());
-    this.inputBar.key(['up', 'down'], (ch, key) => this.handleKeys(ch, key));
+    this.inputBar.key(['up', 'down', 'escape'], (ch, key) => this.handleKeys(ch, key));
     this.logDir = path.resolve(config.logDir ?? './logs');
     this.debug = config.debug ?? false;
     this.history = new HistoryManager(config.historyDir ?? this.logDir);
@@ -117,6 +117,9 @@ export default class Screen {
         break;
       case 'down':
         this.inputBar.setValue(this.history.forward());
+        break;
+      case 'escape':
+        if (this.history.isInHistory()) this.inputBar.setValue('');
         break;
     }
     this._screen.render();

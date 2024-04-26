@@ -39,4 +39,8 @@ export default class HistoryManager {
     else return '';
     return this.history[this.index];
   }
+
+  isInHistory() {
+    return this.index < this.history.length;
+  }
 }
