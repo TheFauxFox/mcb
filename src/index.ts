@@ -5,67 +5,30 @@ import { ArgumentParser } from 'argparse';
 import { sleep } from './lib/time';
 import { tpsGetter } from './lib/serverHacks';
 import { NBTData } from './lib/nbtData';
+import Config from './lib/config';
 
 const parser = new ArgumentParser({
   description: 'Minecraft Console Chat Client',
 });
 
-parser.add_argument('-u', '--username', {
-  help: 'Minecraft email for Microsoft',
-  required: true,
-  type: String,
-});
-parser.add_argument('-p', '--password', {
-  help: 'Minecraft password',
-  required: true,
-  type: String,
-});
-parser.add_argument('-s', '--server', {
-  help: 'Server IP',
-  required: true,
-  type: String,
-});
-parser.add_argument('-r', '--reconnect', {
-  help: 'Enable autoreconnect',
-  required: false,
-  type: Boolean,
-  default: false,
-});
-parser.add_argument('-t', '--reconnect-time', {
-  help: 'Seconds before reconnecting',
-  required: false,
-  type: Number,
-  default: 3,
-});
-parser.add_argument('-l', '--log-dir', {
-  help: 'Log directory',
+parser.add_argument('-c', '--config', {
+  help: 'Path to config file',
   required: false,
   type: String,
-  default: './logs',
-});
-parser.add_argument('-d', '--debug', {
-  help: 'Enable debug raw json messages in logs',
-  required: false,
-  type: Boolean,
-  default: false,
-});
-parser.add_argument('-H', '--history-dir', {
-  help: 'Where to place the chat history file (defaults to log directory)',
-  required: false,
-  type: String,
-  default: '',
+  default: './bot.toml',
 });
 
 const args = parser.parse_args();
-const screen = new Screen('Minecraft Chat', args.log_dir, args.history_dir, args.debug);
 
-const createBot = async () => {
+const cfg = new Config(args.config);
+
+const createBot = async (screen: Screen) => {
   let bot = null;
   try {
     bot = mineflayer.createBot({
-      host: args.server,
-      username: args.username,
-      password: args.password,
+      host: cfg.config.server,
+      username: cfg.config.email,
+      password: cfg.config.password,
       auth: 'microsoft',
       defaultChatPatterns: false,
       checkTimeoutInterval: 300 * 1000,
@@ -75,7 +38,7 @@ const createBot = async () => {
     if (process.env.RECONNECT === 'true') {
       console.log('Reconnecting...');
       await sleep(1000);
-      await createBot();
+      await createBot(screen);
       return;
     } else {
       screen.exit();
@@ -95,11 +58,11 @@ const createBot = async () => {
   });
 
   bot.on('message', async (msg, position) => {
-    if (args.debug) {
+    if (cfg.config.debug) {
       screen.log(`[DEBUG] ${JSON.stringify(msg)} | ${position}`);
     }
     if (position == 'system' || position == 'chat') {
-      if (args.debug) {
+      if (cfg.config.debug) {
         screen.log(JSON.stringify(msg.json));
       }
       if ('unsigned' in msg) {
@@ -116,7 +79,7 @@ const createBot = async () => {
   });
 
   bot.on('kicked', async () => {
-    if (args.reconnect === 'true') {
+    if (cfg.config.reconnect) {
       screen.addChatLine(`{green-fg}You've been kicked!{/}`);
       bot.end();
     }
@@ -129,11 +92,11 @@ const createBot = async () => {
   });
 
   bot.on('end', async () => {
-    if (args.reconnect === 'true') {
+    if (cfg.config.reconnect) {
       screen.addChatLine(`Disconnected.`);
-      screen.addChatLine(`Reconnecting in ${args.reconnect_time} seconds...`);
-      await sleep(parseInt(args.reconnect_time ?? '3') * 1000);
-      createBot();
+      screen.addChatLine(`Reconnecting in ${cfg.config.reconnect_time} seconds...`);
+      await sleep(cfg.config.reconnect_time ?? 3000);
+      createBot(screen);
     }
   });
 
@@ -147,7 +110,7 @@ const createBot = async () => {
       } else if (text.match(/^:reco/i)) {
         bot.quit('Reconnecting');
         screen.addChatLine('{red-fg}Reconnecting...{/}');
-        createBot();
+        createBot(screen);
       } else {
         bot.chat(text);
       }
@@ -175,4 +138,8 @@ const createBot = async () => {
     }
   });
 };
-createBot();
+
+if (cfg.continue) {
+  const screen = new Screen('Minecraft Chat', cfg.config);
+  createBot(screen);
+}

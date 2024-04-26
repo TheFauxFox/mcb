@@ -7,6 +7,7 @@ import path from 'path';
 import chatParser from '../lib/parsers';
 import { getDateStamp, getTimeStamp, mcTimeToHRT } from '../lib/time';
 import HistoryManager from '../lib/history';
+import { IConfig } from '../lib/config';
 
 export default class Screen {
   _screen: blessed.Widgets.Screen;
@@ -26,7 +27,7 @@ export default class Screen {
   debug: boolean;
   history: HistoryManager;
 
-  constructor(name: string, logDir: string = './logs', historyDir: string = '', debug = false) {
+  constructor(name: string, config: IConfig) {
     this._screen = blessed.screen({
       smartCSR: true,
       title: name,
@@ -47,12 +48,9 @@ export default class Screen {
     this.inputBar.focus();
     this._screen.key(['C-c'], () => this.exit());
     this.inputBar.key(['up', 'down'], (ch, key) => this.handleKeys(ch, key));
-    this.logDir = path.resolve(logDir);
-    this.debug = debug;
-    if (historyDir == '') {
-      historyDir = this.logDir;
-    }
-    this.history = new HistoryManager(historyDir);
+    this.logDir = path.resolve(config.logDir ?? './logs');
+    this.debug = config.debug ?? false;
+    this.history = new HistoryManager(config.historyDir ?? this.logDir);
     mkdirSync(this.logDir, { recursive: true });
   }
 

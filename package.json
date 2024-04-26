@@ -18,7 +18,8 @@
   "dependencies": {
     "argparse": "^2.0.1",
     "blessed": "^0.1.81",
-    "mineflayer": "^4.20.1"
+    "mineflayer": "^4.20.1",
+    "toml": "^3.0.0"
   },
   "devDependencies": {
     "@types/argparse": "^2.0.16",
