@@ -1,0 +1,39 @@
+name: 'Build & Publish'
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Use Node.js v20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Lint, Compile, and Build
+        run: npm run ci
+
+      - name: 'Get Package Version'
+        id: package_name
+        run: |
+          sed -nr 's/^.*?"version": "(.*)",$/\1/p' package.json >> $GITHUB_OUTPUT
+
+      - name: 'Publish new release'
+        uses: softprops/action-gh-release@v2
+        with:
+          name: 'MinecraftConsoleBot v${{steps.package_name.outputs.VERSION}}'
+          files: |
+            build/MinecraftConsoleBot-linux
+            build/MinecraftConsoleBot-win.exe
