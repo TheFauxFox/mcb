@@ -11,9 +11,7 @@ reconnect_delay = 5   # Seconds to wait before reconnecting
 reconnect = false     # Should we reconnect after disconnect/kick?
 logDir = "./logs"     # Directory to place logs for this bot
 historyDir = "./logs" # Where should we place our .hist file for scrollback
-
 debug = false # Spam logs with debug info
-
 
 [botOwner] # This is not required, but all args for it are if it's declared
 usernames = [
