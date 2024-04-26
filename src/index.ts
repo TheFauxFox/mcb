@@ -26,28 +26,14 @@ const args = parser.parse_args();
 const cfg = new Config(args.config);
 
 const createBot = async (screen: Screen) => {
-  let bot = null;
-  try {
-    bot = mineflayer.createBot({
-      host: cfg.config.server,
-      username: cfg.config.email,
-      password: cfg.config.password,
-      auth: 'microsoft',
-      defaultChatPatterns: false,
-      checkTimeoutInterval: 300 * 1000,
-    });
-    bot.on('error', console.error);
-  } catch (e) {
-    if (cfg.config.reconnect) {
-      console.log('Reconnecting...');
-      await sleep(1000);
-      createBot(screen);
-    } else {
-      screen.exit();
-      console.log(e);
-      process.exit(1);
-    }
-  }
+  const bot = mineflayer.createBot({
+    host: cfg.config.server,
+    username: cfg.config.email,
+    password: cfg.config.password,
+    auth: 'microsoft',
+    defaultChatPatterns: false,
+    checkTimeoutInterval: 300 * 1000,
+  });
   const tps = new tpsGetter();
 
   if (bot == null) {
