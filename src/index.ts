@@ -38,11 +38,10 @@ const createBot = async (screen: Screen) => {
     });
     bot.on('error', console.error);
   } catch (e) {
-    if (process.env.RECONNECT === 'true') {
+    if (cfg.config.reconnect) {
       console.log('Reconnecting...');
       await sleep(1000);
-      await createBot(screen);
-      return;
+      createBot(screen);
     } else {
       screen.exit();
       console.log(e);
