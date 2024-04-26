@@ -18,7 +18,7 @@ debug = false # Spam logs with debug info
 [botOwner] # This is not required, but all args for it are if it's declared
 username = "Notch" # Username or Displayname of the main account controlling the bot
 # How the server's /msg are formatted. %playername% will match any username in that spot to the owner's username, case sensitive
-msgRegex = "\[%playername% -> me\]"
+msgRegex = "\\[%playername% -> me\\]"
 runOnMsg = true # Whether the bot should echo back all commands/messages from the owner
 
 # When the bot connects, what commands should it run?
