@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Auto update the major/minor/patch with commands
+VERSION=$(sed -nr 's/^.*?"version": "(.*)",$/\1/p' package.json)
+
+MAJOR=$(echo "$VERSION" | grep -oP '^\d+(?=\..*)')
+MINOR=$(echo "$VERSION" | grep -oP '^\d+\.\K\d+(?=\..*)')
+PATCH=$(echo "$VERSION" | grep -oP '^\d+\.\d+\.\K(.*)')
+
+TO_MOD=$1
+
+if [[ -z $1 ]]; then
+  TO_MOD="patch"
+fi
+
+if [[ $TO_MOD == "major" ]]; then
+  MAJOR=$(("$MAJOR" + 1))
+fi
+
+if [[ $TO_MOD == "minor" ]]; then
+  MINOR=$(("$MINOR" + 1))
+fi
+
+if [[ $TO_MOD == "patch" ]]; then
+  PATCH=$(("$PATCH" + 1))
+fi
+
+echo "Updating: $VERSION -> $MAJOR.$MINOR.$PATCH"
+
+read -r -p "Continue? [Y/n] " response
+if [[ "$response" =~ ^([nN][oO]|[nN])$ ]]
+then
+  echo "Cancelled"
+else
+  sed -i "s/\(\"version\": \"\)$VERSION\(\",\)/\1$MAJOR.$MINOR.$PATCH\2/" package.json
+  TAG=$(sed -nr 's/^.*?"version": "(.*)",$/\1/p' package.json)
+  echo -e "\nNew Tag: v$TAG"
+
+#   git add package.json
+#   git commit -m "Update to v$TAG"
+
+#   git tag v"$TAG"
+#   git push origin HEAD v"$TAG"
+fi
