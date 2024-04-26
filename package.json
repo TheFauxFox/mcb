@@ -1,5 +1,5 @@
 {
-  "name": "minecraft-console-bot",
+  "name": "mcb",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,9 +8,9 @@
     "test": "jest",
     "clean": "rimraf build/ dist/",
     "lint": "prettier -c src/**/* && eslint src/**/*",
-    "compile": "pkg -t node18-linux,node18-win --no-bytecode --public-packages '*' --public -C GZip -c ./package.json ./build/js/index.js -o ./build/MinecraftConsoleBot",
+    "compile": "pkg -t node18-linux,node18-win --no-bytecode --public-packages '*' --public -C GZip -c ./package.json ./build/js/index.js -o ./build/MinecraftConsoleBot --options='no-warnings=true'",
     "build": "npm run clean && tsc && npm run compile",
-    "ci": "npm run lint && npm run test"
+    "ci": "npm run lint && npm run test && npm run build"
   },
   "keywords": [],
   "author": "",
