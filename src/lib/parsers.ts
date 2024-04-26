@@ -93,3 +93,7 @@ export const pingParser = (ping: number): string => {
   }
   return `{${hex}-fg}${pingStr}ms{/}`;
 };
+
+export const cleanChatStr = (str: string): string => {
+  return str.replace(/\{(.*?-fg|bold|underlined|\/)\}/gi, '');
+};

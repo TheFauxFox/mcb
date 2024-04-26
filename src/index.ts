@@ -1,5 +1,5 @@
 import mineflayer from 'mineflayer';
-import chatParser from './lib/parsers';
+import chatParser, { cleanChatStr } from './lib/parsers';
 import Screen from './screen';
 import { ArgumentParser } from 'argparse';
 import { sleep } from './lib/time';
@@ -53,8 +53,27 @@ const createBot = async (screen: Screen) => {
     process.exit(1);
   }
 
-  bot.once('spawn', () => {
+  bot.once('spawn', async () => {
     screen.addChatLine('Logged in!');
+    if (cfg.config.runOnJoin) {
+      if (Array.isArray(cfg.config.runOnJoin.commands)) {
+        for (const command of cfg.config.runOnJoin.commands) {
+          if (typeof command === 'string') {
+            const cmd = command.startsWith('/') ? command : `/${command}`;
+            bot.chat(cmd);
+          } else {
+            if (command.delay) {
+              await sleep(command.delay);
+            } else if (command.randDelay) {
+              const [min, max] = command.randDelay.split('-').map(Number);
+              await sleep(Math.floor(Math.random() * (max - min + 1) + min));
+            }
+            const cmd = command.command.startsWith('/') ? command.command : `/${command.command}`;
+            bot.chat(cmd);
+          }
+        }
+      }
+    }
   });
 
   bot.on('message', async (msg, position) => {
@@ -65,15 +84,27 @@ const createBot = async (screen: Screen) => {
       if (cfg.config.debug) {
         screen.log(JSON.stringify(msg.json));
       }
+      let str = '';
       if ('unsigned' in msg) {
-        screen.addChatLine(
-          await chatParser(
-            (msg as { unsigned: { json: NBTData } }).unsigned.json as NBTData,
-            bot.version
-          )
+        str = await chatParser(
+          (msg as { unsigned: { json: NBTData } }).unsigned.json as NBTData,
+          bot.version
         );
       } else {
-        screen.addChatLine(await chatParser(msg.json, bot.version));
+        str = await chatParser(msg.json, bot.version);
+      }
+      screen.addChatLine(str);
+      const cleanStr = cleanChatStr(str);
+      if (cfg.config.botOwner && cfg.config.botOwner.runOnMsg) {
+        for (const user of cfg.config.botOwner.usernames) {
+          const chatMatcher = new RegExp(
+            cfg.config.botOwner.msgRegex.replace('%playername%', user)
+          );
+          if (chatMatcher.test(cleanStr)) {
+            const cmd = cleanStr.replace(chatMatcher, '').trimStart();
+            bot.chat(cmd);
+          }
+        }
       }
     }
   });

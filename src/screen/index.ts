@@ -1,4 +1,4 @@
-import { pingParser } from './../lib/parsers';
+import { cleanChatStr, pingParser } from './../lib/parsers';
 import mineflayer from 'mineflayer';
 import blessed from 'blessed';
 import { mkdirSync } from 'fs';
@@ -126,7 +126,7 @@ export default class Screen {
     this.chatBox.pushLine(msg);
     this.chatBox.setScrollPerc(100);
     this._screen.render();
-    this.log(this.debug ? msg : msg.replace(/\{(.*?-fg|bold|underlined|\/)\}/gi, ''));
+    this.log(this.debug ? msg : cleanChatStr(msg));
   }
 
   async log(msg: string) {
