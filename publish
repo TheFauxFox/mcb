@@ -36,9 +36,9 @@ else
   TAG=$(sed -nr 's/^.*?"version": "(.*)",$/\1/p' package.json)
   echo -e "\nNew Tag: v$TAG"
 
-#   git add package.json
-#   git commit -m "Update to v$TAG"
+  git add package.json
+  git commit -m "Update to v$TAG"
 
-#   git tag v"$TAG"
-#   git push origin HEAD v"$TAG"
+  git tag v"$TAG"
+  git push origin HEAD v"$TAG"
 fi
