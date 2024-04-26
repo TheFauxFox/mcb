@@ -28,7 +28,7 @@ jobs:
       - name: 'Get Package Version'
         id: package_name
         run: |
-          sed -nr 's/^.*?"version": "(.*)",$/\1/p' package.json >> $GITHUB_OUTPUT
+          echo "VERSION=$(sed -nr 's/^.*?\"version\": \"(.*)\",$/\1/p' package.json)" >> $GITHUB_OUTPUT
 
       - name: 'Publish new release'
         uses: softprops/action-gh-release@v2
