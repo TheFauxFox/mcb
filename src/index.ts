@@ -3,7 +3,7 @@ import chatParser, { cleanChatStr } from './lib/parsers';
 import Screen from './screen';
 import { ArgumentParser } from 'argparse';
 import { sleep } from './lib/time';
-import { tpsGetter } from './lib/serverHacks';
+import { pinger, tpsGetter } from './lib/serverHacks';
 import { NBTData } from './lib/nbtData';
 import Config from './lib/config';
 import { version } from '../package.json';
@@ -26,6 +26,7 @@ const args = parser.parse_args();
 const cfg = new Config(args.config);
 
 const createBot = async (screen: Screen) => {
+  if (!(await pinger(cfg.config.server))) return;
   const bot = mineflayer.createBot({
     host: cfg.config.server,
     username: cfg.config.email,

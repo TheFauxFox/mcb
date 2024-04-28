@@ -30,7 +30,7 @@ export const pinger = async (addr: string, timeout: number = 30_000, count = 10)
   let host = '';
   let port = 25565;
 
-  if (addr.match(/\d+\.\d+\.\d+\.\d+/)) {
+  if (addr.match(/\d+\.\d+\.\d+\.\d+/) || addr.match(/localhost/i)) {
     host = addr.includes(':') ? addr.split(':')[0] : addr;
     port = addr.includes(':') ? parseInt(addr.split(':')[1]) : 25565;
   } else {
@@ -67,5 +67,3 @@ export const pinger = async (addr: string, timeout: number = 30_000, count = 10)
 
   return false;
 };
-
-pinger('play.theoasismc.com').then(console.log);
