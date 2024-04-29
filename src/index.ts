@@ -1,6 +1,6 @@
 import mineflayer from 'mineflayer';
 import chatParser, { cleanChatStr } from './lib/parsers';
-import Screen from './screen';
+import Screen from './lib/screen';
 import { ArgumentParser } from 'argparse';
 import { sleep } from './lib/time';
 import { pinger, tpsGetter } from './lib/serverHacks';

@@ -1,13 +1,13 @@
-import { cleanChatStr, pingParser } from './../lib/parsers';
+import { cleanChatStr, pingParser } from './parsers';
 import mineflayer from 'mineflayer';
 import blessed from 'blessed';
 import { mkdirSync } from 'fs';
 import { appendFile } from 'fs/promises';
 import path from 'path';
-import chatParser from '../lib/parsers';
-import { getDateStamp, getTimeStamp, mcTimeToHRT } from '../lib/time';
-import HistoryManager from '../lib/history';
-import { IConfig } from '../lib/config';
+import chatParser from './parsers';
+import { getDateStamp, getTimeStamp, mcTimeToHRT } from './time';
+import HistoryManager from './history';
+import { IConfig } from './config';
 
 export default class Screen {
   _screen: blessed.Widgets.Screen;
