@@ -32,6 +32,7 @@ export default class Screen {
       smartCSR: true,
       title: name,
       terminal: 'xterm-256color',
+      fullUnicode: true,
       ignoreLocked: ['C-c'],
     });
     this.defaultOptions = {
@@ -53,6 +54,10 @@ export default class Screen {
     this.history = new HistoryManager(config.historyDir ?? this.logDir);
     mkdirSync(this.logDir, { recursive: true });
     this._screen.render();
+  }
+
+  setTitle(title: string) {
+    this._screen.title = title;
   }
 
   addWidgets() {
@@ -161,7 +166,7 @@ export default class Screen {
   }
 
   async updateServerInfo(info: { [key: string]: string }) {
-    let i = -1;
+    let i = 0;
     this.serverInfoBox.setLine(i++, `Logged in as ${info.username}`);
     this.serverInfoBox.setLine(i++, `Version: ${info.version}`);
     this.serverInfoBox.setLine(i++, `TPS: ${info.tps}`);

@@ -5,7 +5,6 @@ import { sleep } from './time';
 export class tpsGetter {
   private lastAge = -1;
   private lastTime = -1;
-  private tps = 0;
   private tickPool: number[] = [];
 
   public tickIngameTime(igt: number) {

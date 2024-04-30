@@ -52,6 +52,7 @@ const createBot = async (screen: Screen) => {
 
   bot.once('spawn', async () => {
     screen.addChatLine('Logged in!');
+    screen.setTitle(`MCB v${version} | ${cfg.config.server} | ${bot.username}`);
     if (cfg.config.runOnJoin) {
       if (Array.isArray(cfg.config.runOnJoin.commands)) {
         for (const command of cfg.config.runOnJoin.commands) {
