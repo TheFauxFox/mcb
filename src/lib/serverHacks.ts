@@ -1,10 +1,12 @@
 import net from 'net';
 import dns from 'dns';
+import { sleep } from './time';
 
 export class tpsGetter {
   private lastAge = -1;
   private lastTime = -1;
   private tps = 0;
+  private tickPool: number[] = [];
 
   public tickIngameTime(igt: number) {
     const time = Date.now();
@@ -18,15 +20,29 @@ export class tpsGetter {
     this.lastTime = time;
     this.lastAge = igt;
     const _tps = diffAge / (diffTime / 1000);
-    this.tps = Math.round(_tps * 100) / 100;
+    this.tickPool.push(Math.round(_tps * 100) / 100);
+    if (this.tickPool.length > 20) {
+      this.tickPool.shift();
+    }
+  }
+
+  private _avgTps() {
+    return this.tickPool.length == 0
+      ? 0
+      : this.tickPool.reduce((a, b) => a + b, 0) / this.tickPool.length;
   }
 
   public getTps() {
-    return this.tps;
+    return this._avgTps().toFixed(2);
   }
 }
 
-export const pinger = async (addr: string, timeout: number = 30_000, count = 10) => {
+export const pinger = async (
+  addr: string,
+  timeout: number = 10_000,
+  count = 30,
+  onReject: (pingCount: number) => void = () => {}
+) => {
   let host = '';
   let port = 25565;
 
@@ -61,8 +77,14 @@ export const pinger = async (addr: string, timeout: number = 30_000, count = 10)
   };
 
   for (let i = 0; i < count; i++) {
+    const start = Date.now();
     const res = await _ping();
     if (res) return true;
+    else onReject(i);
+    const diff = Date.now() - start;
+    if (diff < timeout) {
+      await sleep(timeout - diff);
+    }
   }
 
   return false;

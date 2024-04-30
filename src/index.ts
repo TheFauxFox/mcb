@@ -26,7 +26,15 @@ const args = parser.parse_args();
 const cfg = new Config(args.config);
 
 const createBot = async (screen: Screen) => {
-  if (!(await pinger(cfg.config.server))) return;
+  screen.addChatLine(`Pinging ${cfg.config.server}...`);
+  const ping = await pinger(cfg.config.server, undefined, undefined, (inx) => {
+    screen.addChatLine(`Attepmt ${inx + 1} failed.\nRetrying...`);
+  });
+  if (!ping) {
+    screen.addChatLine(`Could not ping ${cfg.config.server}`);
+    screen.exit();
+    return;
+  }
   const bot = mineflayer.createBot({
     host: cfg.config.server,
     username: cfg.config.email,
@@ -114,8 +122,8 @@ const createBot = async (screen: Screen) => {
   bot.on('end', async () => {
     if (cfg.config.reconnect) {
       screen.addChatLine(`Disconnected.`);
-      screen.addChatLine(`Reconnecting in ${cfg.config.reconnectTime} seconds...`);
-      await sleep(cfg.config.reconnectTime ?? 3000);
+      screen.addChatLine(`Reconnecting in ${cfg.config.reconnectDelay} seconds...`);
+      await sleep((cfg.config.reconnectDelay ?? 3) * 1000);
       createBot(screen);
     }
   });
@@ -148,8 +156,8 @@ const createBot = async (screen: Screen) => {
         ping: bot.player.ping.toString(),
         version: bot.version,
         time: bot.time.timeOfDay.toString(),
-        health: bot.health.toString(),
-        hunger: bot.food.toString(),
+        health: Math.round(bot.health).toString(),
+        hunger: Math.round(bot.food).toString(),
         tps: tps.getTps().toString(),
       });
       screen._screen.render();

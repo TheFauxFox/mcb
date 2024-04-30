@@ -6,7 +6,7 @@ export type IConfig = {
   password: string;
   server: string;
   reconnect?: boolean;
-  reconnectTime?: number;
+  reconnectDelay?: number;
   debug?: boolean;
   logDir?: string;
   historyDir?: string;

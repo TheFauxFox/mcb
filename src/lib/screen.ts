@@ -141,6 +141,7 @@ export default class Screen {
   }
 
   onMessage(listener: (message: string) => void | Promise<void>) {
+    this.inputBar.removeAllListeners('submit');
     this.inputBar.on('submit', listener);
   }
 
