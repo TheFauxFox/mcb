@@ -25,6 +25,7 @@
     "toml": "^3.0.0"
   },
   "devDependencies": {
+    "@liudonghua123/node-sea": "^0.1.4",
     "@types/argparse": "^2.0.16",
     "@types/blessed": "^0.1.25",
     "@types/jest": "^29.5.12",
