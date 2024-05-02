@@ -3,6 +3,11 @@
   "version": "1.1.6",
   "description": "",
   "main": "index.js",
+  "type": "module",
+  "bin": "./build/src/cli.js",
+  "files": [
+    "./build/src"
+  ],
   "engines": {
     "node": ">=20.0.0"
   },
@@ -21,7 +26,10 @@
   "dependencies": {
     "argparse": "^2.0.1",
     "blessed": "^0.1.81",
+    "ink": "^4.4.1",
+    "meow": "^13.2.0",
     "mineflayer": "^4.20.1",
+    "react": "^18.3.1",
     "toml": "^3.0.0"
   },
   "devDependencies": {
@@ -38,7 +46,18 @@
     "rimraf": "^5.0.5",
     "ts-jest": "^29.1.2",
     "tsx": "^4.7.3",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "@sindresorhus/tsconfig": "^3.0.1",
+    "@types/react": "^18.0.32",
+    "@vdemedes/prettier-config": "^2.0.1",
+    "ava": "^5.2.0",
+    "chalk": "^5.2.0",
+    "eslint-config-xo-react": "^0.27.0",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "ink-testing-library": "^3.0.0",
+    "ts-node": "^10.9.1",
+    "xo": "^0.53.1"
   },
   "pkg": {
     "targets": [
@@ -46,5 +65,21 @@
       "node20-win"
     ],
     "assets": "node_modules/blessed/**/*"
+  },
+  "ava": {
+    "extensions": {
+      "ts": "module",
+      "tsx": "module"
+    },
+    "nodeArguments": [
+      "--loader=ts-node/esm"
+    ]
+  },
+  "xo": {
+    "extends": "xo-react",
+    "prettier": true,
+    "rules": {
+      "react/prop-types": "off"
+    }
   }
 }

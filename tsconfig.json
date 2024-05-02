@@ -11,8 +11,12 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
   },
+  "extends": "@sindresorhus/tsconfig",
   "exclude": [
     "./node_modules",
     "./src/test"
+  ],
+  "include": [
+    "./src/**/*"
   ]
 }
