@@ -30,7 +30,7 @@ export default async function chatParser(msg: NBTData, version: string): Promise
   // translation loop
   if (msg.translate && msg.with) {
     if (msg.translate in translationsMap) {
-      const translation = translationsMap[msg.translate];
+      const translation = translationsMap[msg.translate] ?? '';
       if (translation.includes('%s')) {
         let translated = translation;
         for (const arg of msg.with) {

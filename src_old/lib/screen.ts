@@ -115,13 +115,13 @@ export default class Screen {
     this._screen.append(this.playerList);
   }
 
-  handleKeys(ch: string, key: blessed.Widgets.Events.IKeyEventArg) {
+  handleKeys(_ch: string, key: blessed.Widgets.Events.IKeyEventArg) {
     switch (key.name) {
       case 'up':
-        this.inputBar.setValue(this.history.back());
+        this.inputBar.setValue(this.history.back() ?? '');
         break;
       case 'down':
-        this.inputBar.setValue(this.history.forward());
+        this.inputBar.setValue(this.history.forward() ?? '');
         break;
       case 'escape':
         if (this.history.isInHistory()) this.inputBar.setValue('');
@@ -167,12 +167,12 @@ export default class Screen {
 
   async updateServerInfo(info: { [key: string]: string }) {
     let i = 0;
-    this.serverInfoBox.setLine(i++, `Logged in as ${info.username}`);
-    this.serverInfoBox.setLine(i++, `Version: ${info.version}`);
-    this.serverInfoBox.setLine(i++, `TPS: ${info.tps}`);
-    this.serverInfoBox.setLine(i++, `Ping: ${info.ping}ms`);
-    this.serverInfoBox.setLine(i++, `Time: ${mcTimeToHRT(parseInt(info.time))}`);
-    this.serverInfoBox.setLine(i++, `Health: ${info.health}/20`);
-    this.serverInfoBox.setLine(i++, `Hunger: ${info.hunger}/20`);
+    this.serverInfoBox.setLine(i++, `Logged in as ${info['username']}`);
+    this.serverInfoBox.setLine(i++, `Version: ${info['version']}`);
+    this.serverInfoBox.setLine(i++, `TPS: ${info['tps']}`);
+    this.serverInfoBox.setLine(i++, `Ping: ${info['ping']}ms`);
+    this.serverInfoBox.setLine(i++, `Time: ${mcTimeToHRT(parseInt(info['time'] ?? '0'))}`);
+    this.serverInfoBox.setLine(i++, `Health: ${info['health']}/20`);
+    this.serverInfoBox.setLine(i++, `Hunger: ${info['hunger']}/20`);
   }
 }
