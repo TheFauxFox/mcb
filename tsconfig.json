@@ -14,9 +14,9 @@
   "extends": "@sindresorhus/tsconfig",
   "exclude": [
     "./node_modules",
-    "./src/test"
+    "src_old/test"
   ],
   "include": [
-    "./src/**/*"
+    "src_old/**/*"
   ]
 }
