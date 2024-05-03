@@ -9,6 +9,7 @@ type Props = {
   showCursor?: boolean;
   highlightPastedText?: boolean;
   value: string;
+  size?: number[];
   onChange?: (value: string) => void;
   onSubmit?: (value: string) => void;
 };
@@ -20,6 +21,7 @@ export const TextInput = ({
   mask,
   highlightPastedText = false,
   showCursor = true,
+  size,
   onChange,
   onSubmit,
 }: Props) => {
@@ -46,6 +48,7 @@ export const TextInput = ({
   const cursorActualWidth = highlightPastedText ? cursorWidth : 0;
   const value = mask ? mask.repeat(originalValue.length) : originalValue;
   let renderedValue = value;
+
   let renderedPlaceholder = placeholder ? chalk.grey(placeholder) : undefined;
   // Fake mouse cursor, because it's too inconvenient to deal with actual cursor and ansi escapes
   if (showCursor && focus) {
@@ -63,6 +66,11 @@ export const TextInput = ({
     if (value.length > 0 && cursorOffset === value.length) {
       renderedValue += chalk.inverse(' ');
     }
+  }
+  if (size && size[0] && renderedValue.length > size[0] - 1) {
+    renderedValue = renderedValue.slice(
+      Math.max(3, Math.min(renderedValue.length - size[0], cursorOffset + 1))
+    );
   }
   useInput(
     (input, key) => {

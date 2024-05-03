@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useStdout } from 'ink';
 // https://github.com/cameronhunter/ink-monorepo/blob/master/packages/ink-use-stdout-dimensions/src/index.ts
 // The package just didn't work and threw errors.
-export function getTermWidth(): [number, number] {
+export function getTermSize(): [number, number] {
   const { stdout } = useStdout();
   const [dimensions, setDimensions] = useState<[number, number]>([stdout.columns, stdout.rows]);
 
