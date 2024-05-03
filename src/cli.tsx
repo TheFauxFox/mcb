@@ -1,29 +1,21 @@
 #!/usr/bin/env node
 import React from 'react';
 import { render } from 'ink';
-import meow from 'meow';
+// import { ArgumentParser } from 'argparse';
 import App from './app.js';
 
-const cli = meow(
-  `
-	Usage
-	  $ test
+// const parser = new ArgumentParser({
+//   description: 'Minecraft Console Chat Client',
+// });
 
-	Options
-		--name  Your name
+// parser.add_argument('-c', '--config', {
+//   help: 'Path to config file',
+//   required: false,
+//   type: String,
+//   default: './bot.toml',
+// });
 
-	Examples
-	  $ test --name=Jane
-	  Hello, Jane
-`,
-  {
-    importMeta: import.meta,
-    flags: {
-      name: {
-        type: 'string',
-      },
-    },
-  }
-);
+// const args = parser.parse_args();
 
-render(<App name={cli.flags.name} />);
+// render(<App name={args.config} />);
+render(<App />);
