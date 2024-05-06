@@ -1,58 +1,132 @@
-import React, { useState } from 'react';
-import { Text, Box, measureElement, DOMElement } from 'ink';
+import React, { useEffect, useState } from 'react';
+import { Text, Box, DOMElement, measureElement } from 'ink';
 import { getTermSize } from './lib/term.js';
-import TextInput from './lib/textInput.js';
+import TextInput from 'ink-text-input';
+import { pingParser } from './lib/parsers.js';
 
-// type Props = {
-//   name: string | undefined;
-// };
-
-export default function App(/*{ name = 'Stranger' }: Props*/) {
+export default function App() {
   const [wid, hei] = getTermSize();
-  const [inputSize, _setInputSize] = useState([0, 3]);
   const [chatMessage, setChatMessage] = useState('');
-  const chat = useState<string[]>([]);
+  const playerNameWidth = 16;
+  const pingWidth = 4;
+  const separatorWidth = 5;
+  let chatHeight = hei - 3;
+  let playersHeight = Math.floor(hei * 0.6);
+  let serverInfoHeight = Math.ceil(hei * 0.4);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [chat, _setChat] = useState<string[]>([
+    'Logged In!',
+    'Welcome to the server!',
+    'Type /help for a list of commands.',
+    'Type /list to see who is online.',
+  ]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [players, _setPlayers] = useState<string[]>([
+    'Player1',
+    'Player2',
+    'Player3',
+    'Player4',
+    'Player5',
+    'Player6',
+    'Player7',
+    'Player8',
+    'Player9',
+    'Player10',
+  ]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [serverInfo, _setServerInfo] = useState<string[]>([
+    'Server IP:',
+    'Server Port:',
+    'Server Version:',
+    'Server Uptime:',
+    'Server TPS:',
+  ]);
+  const refresh = () => {
+    const subSize = 5;
+    if (chatboxRef.current !== null) {
+      const size = measureElement(chatboxRef.current);
+      chatHeight = size.height - subSize;
+    }
+    if (playersRef.current !== null) {
+      const size = measureElement(playersRef.current);
+      playersHeight = size.height - subSize;
+    }
+    if (serverinfoRef.current !== null) {
+      const size = measureElement(serverinfoRef.current);
+      serverInfoHeight = size.height - subSize;
+    }
+  };
+  useEffect(() => {
+    refresh();
+  }, [chat, players, serverInfo]);
   const inputRef = React.createRef<DOMElement>();
+  const chatboxRef = React.createRef<DOMElement>();
+  const playersRef = React.createRef<DOMElement>();
+  const serverinfoRef = React.createRef<DOMElement>();
+
   return (
     <Box width={wid} height={hei}>
-      <Box flexDirection={'column'} width={wid - 44}>
-        <Box height={hei - 1} flexDirection={'column'} borderStyle={'single'}>
-          <Text>
-            <Text color="cyanBright">Logged in!</Text>
+      <Box flexDirection={'column'} width={wid - (playerNameWidth + pingWidth + separatorWidth)}>
+        <Box
+          height={hei}
+          flexDirection={'column'}
+          borderStyle={'single'}
+          flexShrink={5}
+          ref={chatboxRef}
+          overflowY="hidden"
+        >
+          <Text color="whiteBright" bold={true} underline={true}>
+            {'Chat' + ' '.repeat(wid - 31)}
           </Text>
-          {chat[0].map((line, ix) => (
-            <Text key={ix}>{line}</Text>
+          {chat.slice(-(chatHeight - 3)).map((line) => (
+            <Text>{line}</Text>
           ))}
         </Box>
-        <Box height={3} width={'100%'} borderStyle={'single'} ref={inputRef}>
+        <Box minHeight={3} width={'100%'} ref={inputRef} flexGrow={1} borderStyle={'single'}>
           <TextInput
-            placeholder="Type to Chat"
+            placeholder="Send a message..."
             value={chatMessage}
-            size={inputSize}
             onChange={(value) => {
+              if (value.length > 256) return;
               setChatMessage(value);
-              if (inputRef.current) {
-                const size = measureElement(inputRef.current);
-                _setInputSize([size.width + 7, size.height - 2]);
-              }
             }}
             onSubmit={(val: string) => {
-              chat[0].push(val);
+              _setChat(chat.concat(val));
               setChatMessage('');
             }}
           />
         </Box>
       </Box>
       <Box flexDirection={'column'}>
-        <Box flexDirection={'column'} borderStyle={'single'} width={44} height={'70%'}>
-          <Text>Hello</Text>
-          <Text>world</Text>
-          <Text>!</Text>
+        <Box
+          flexDirection={'column'}
+          borderStyle={'single'}
+          width={playerNameWidth + pingWidth + separatorWidth}
+          height={playersHeight}
+          ref={playersRef}
+          overflowY="hidden"
+        >
+          <Text color="whiteBright" bold={true} underline={true}>
+            {'Players' + ' '.repeat(16)}
+          </Text>
+          {players
+            .slice(0, playersHeight - 3)
+            .map((player) => pingParser(Math.floor(Math.random() * 200), player))}
         </Box>
-        <Box flexDirection={'column'} borderStyle={'single'} width={44} height={'30%'}>
-          <Text>Hello</Text>
-          <Text>world</Text>
-          <Text>!</Text>
+        <Box
+          flexDirection={'column'}
+          borderStyle={'single'}
+          width={playerNameWidth + pingWidth + separatorWidth}
+          height={serverInfoHeight}
+          ref={serverinfoRef}
+          overflowY="hidden"
+        >
+          <Text color="whiteBright" bold={true} underline={true}>
+            {'Server Info' + ' '.repeat(12)}
+          </Text>
+          {serverInfo.slice(0, serverInfoHeight - 3).map((line) => (
+            <Text>{line}</Text>
+          ))}
         </Box>
       </Box>
     </Box>
