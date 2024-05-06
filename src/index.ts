@@ -64,7 +64,7 @@ const createBot = async (screen: Screen) => {
               await sleep(command.delay);
             } else if (command.randDelay) {
               const [min, max] = command.randDelay.split('-').map(Number);
-              await sleep(Math.floor(Math.random() * (max - min + 1) + min));
+              await sleep(Math.floor(Math.random() * ((max ?? 0) - (min ?? 0) + 1) + (min ?? 0)));
             }
             const cmd = command.command.startsWith('/') ? command.command : `/${command.command}`;
             bot.chat(cmd);

@@ -46,15 +46,15 @@ export const pinger = async (
   let port = 25565;
 
   if (addr.match(/\d+\.\d+\.\d+\.\d+/) || addr.match(/localhost/i)) {
-    host = addr.includes(':') ? addr.split(':')[0] : addr;
-    port = addr.includes(':') ? parseInt(addr.split(':')[1]) : 25565;
+    host = (addr.includes(':') ? addr.split(':')[0] : addr) ?? 'localhost';
+    port = addr.includes(':') ? parseInt(addr.split(':')[1] ?? '25565') : 25565;
   } else {
     const realIP = await dns.promises.resolveSrv(`_minecraft._tcp.${addr}`);
     if (realIP.length === 0) {
       return false;
     }
-    host = realIP[0].name;
-    port = realIP[0].port;
+    host = realIP[0]?.name ?? 'localhost';
+    port = realIP[0]?.port ?? 25565;
   }
 
   const _ping = (): Promise<boolean> => {
