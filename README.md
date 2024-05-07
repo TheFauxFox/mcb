@@ -6,9 +6,8 @@ Used Libraries:
  * [PrismarineJS/mineflayer](https://www.npmjs.com/package/mineflayer) for a near-seamless Minecraft interface
  * [nodeca/argparse](https://www.npmjs.com/package/argparse) for easy command line parsing
  * [BinaryMuse/toml](https://www.npmjs.com/package/toml) for the bot's config file
- * [vercel/pkg](https://www.npmjs.com/package/pkg) to bundle the Node runtime into a single file application
-  > Yes I know pkg is depricated, I'm planning on updating to SEA once I can get it working properly.
-
+ * [yao-pkg/pkg](https://www.npmjs.com/package/@yao-pkg/pkg) to bundle the Node runtime into a single file application
+  
 # Usage
 Download the latest release from [here](https://github.com/TheFauxFox/mcb/releases)  
 Place the downloaded file into it's own folder  
