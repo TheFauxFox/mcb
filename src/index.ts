@@ -27,7 +27,7 @@ const cfg = new Config(args.config);
 
 const createBot = async (screen: Screen) => {
   screen.addChatLine(`Pinging ${cfg.config.server}...`);
-  const ping = await pinger(cfg.config.server, undefined, undefined, (inx) => {
+  const ping = await pinger(cfg.config.server, 10_000, 9999999, (inx) => {
     screen.addChatLine(`Attepmt ${inx + 1} failed.\nRetrying...`);
   });
   if (!ping) {
