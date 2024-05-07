@@ -129,6 +129,11 @@ const createBot = async (screen: Screen) => {
     }
   });
 
+  bot.on('error', async (err) => {
+    screen.log(`ERR: ${JSON.stringify(err)}`);
+    bot.end();
+  });
+
   screen.onMessage(async (text) => {
     if (text.length > 0) {
       screen.history.add(text);
